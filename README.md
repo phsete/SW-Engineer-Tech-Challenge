@@ -14,6 +14,24 @@ If we update this document during the challenge, we will inform you about this s
 
 We wish you a lot of fun and success with the challenge 🚀
 
-# Time taken
+# Regarding my solution
+
+## Notes
+- The data is automatically processed when sent by the PACS.
+- It is then stored in a file based sqlite database on server side (series_data.db) 
+
+## Planning Documents
+General description from the processing pipeline of a set of datasets:
+
+![sequence diagram](https://www.plantuml.com/plantuml/png/TP6nJiCm48PtFyMDC32mPa0jYSI4LCW3LCO-g2N7PzddLBmzbpP44AVh_zt_wxEyowmJby4hRPWI7FPjhw94phYe0yChMUqTV_T2iMyF_s2FoM7kN8wQpGdJ1cp9UvJfYesOG2bF5A44TXu2GS0pMCqw8yEds3n2HaF1gaaB7fug6sXaAbZehYLLSUci9QMpjqi5cE2jO45LtKbtzOO6KWd7V0cFvZVDTxFplK9nNNLkABmWGqj3zCYuwDzG637zVQWepwcQePnDu4D6v4wFE9rqpmlUD7Z774acpuvFqBFcahS5Lba37Lwi3QLqtN3Xg_hkdUYMmVy0)
+
+Class diagram:
+
+![class diagram](https://www.plantuml.com/plantuml/png/TL9DRnmX3BtpApXk3kaF6FMGA6cbbVgnrRIdga8EE0ag0rCmKLTf_dlDm6IwQBjxOFpmUxOVlae4aVBan0pw9poWrCwY9_aij8EKv8ZHOhe9pg6c41bF2wAiPwhNgB8rWqmKsyNGA8BffF9iW52HdN2Gzou02MFJ3AGVrL8QcNmNWXEA5IqfjMC29AGB0SQyLjdGbvF6RfiOncVXGfW7UPsENjlmvWD7ubV6Z1lsfOHY2WQSfQDAclC_jcZawN2yEQppwNNaeVVW-u-jsGinWVLynEnLpqoCRzDsbto7loc29bLc-pULGib-mfBpml_rQIguFSqQminpl8T4ruUzA8sPEsOUFezV1yacjjAxUdIIUdxLwvqeoiMyTs8nYf5QiHaDPuo64wDvM7zl7t941SWTFO8t3bKg-ZjyGa-dpV33e4lTwd5OF_Pj5RxjR-k-IVuTWCgwVe89Uv1AdlMqG2DbSpohi8AiN-jKKkchDV3sp-LblmEYDwjczKifEjf_igxGcpovlm00)
+
+## Time taken
 - 30 Minutes Research on DICOM and testing out PACS
+- 20 minute planning
 - 1 hour implementing functions
+- 1 hour implementing tests
+- 15 minutes refining planning diagrams
