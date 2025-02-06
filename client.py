@@ -99,17 +99,22 @@ class SeriesDispatcher:
             await asyncio.sleep(0.2)
         print("started dispatch")
         self.series_collector[uid].dispatch_started = True
-        await self.dispatch_to_server(uid)
+        self.dispatch_to_server(uid)
         self.series_collector.pop(uid)
 
-    async def dispatch_to_server(self, uid) -> None:
+    def extract_data(self, uid) -> models.Series:
+        initial_dataset = self.series_collector[uid].series[0]
         series = models.Series(
             SeriesInstanceUID = self.series_collector[uid].series_instance_uid,
-            PatientName = "TestName",
-            PatientID = 1,
-            StudyInstanceUID = "ABCSTUDYTESTUID",
-            InstancesInSeries = 42)
-        print("dispatched data", self.series_collector[uid].series_instance_uid)
+            PatientName = str(initial_dataset.PatientName),
+            PatientID = initial_dataset.PatientID,
+            StudyInstanceUID = initial_dataset.StudyInstanceUID,
+            InstancesInSeries = len(self.series_collector[uid].series))
+        return series
+
+    def dispatch_to_server(self, uid) -> None:
+        series = self.extract_data(uid)
+        print("dispatched data", series.SeriesInstanceUID)
         requests.post("http://localhost:8000/series", json=series.model_dump())
 
 
