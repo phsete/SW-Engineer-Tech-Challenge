@@ -2,6 +2,9 @@ import asyncio
 import time
 from pydicom import Dataset
 from scp import ModalityStoreSCP
+import requests
+import models
+from typing import Dict
 
 
 class SeriesCollector:
@@ -50,30 +53,39 @@ class SeriesDispatcher:
         """
 
         self.loop: asyncio.AbstractEventLoop
-        self.modality_scp = ModalityStoreSCP()
-        self.series_collector = None
+        self.queue = asyncio.Queue()
+        self.modality_scp: ModalityStoreSCP
+        self.series_collector: Dict[str, SeriesCollector] = {}
 
     async def main(self) -> None:
         """An infinitely running method used as hook for the asyncio event loop.
         Keeps the event loop alive whether or not datasets are received from the modality and prints a message
         regulary when no datasets are received.
         """
+        self.modality_scp = ModalityStoreSCP(self.loop, self.queue)
+
         while True:
             # TODO: Regulary check if new datasets are received and act if they are.
             # Information about Python asyncio: https://docs.python.org/3/library/asyncio.html
             # When datasets are received you should collect and process them
             # (e.g. using `asyncio.create_task(self.run_series_collector()`)
-            
-            print("Waiting for Modality")
-            await asyncio.sleep(0.2)
 
-    async def run_series_collectors(self) -> None:
+            dataset: Dataset = await self.queue.get()
+            self.loop.create_task(self.run_series_collectors(dataset))
+
+    async def run_series_collectors(self, dataset: Dataset) -> None:
         """Runs the collection of datasets, which results in the Series Collector being filled.
         """
         # TODO: Get the data from the SCP and start dispatching
-        pass
 
-    async def dispatch_series_collector(self) -> None:
+        uid = dataset.SeriesInstanceUID
+        if uid in self.series_collector:
+            self.series_collector[uid].add_instance(dataset)
+        else:
+            self.series_collector[uid] = SeriesCollector(dataset)
+            self.loop.create_task(self.dispatch_series_collector(uid))
+
+    async def dispatch_series_collector(self, uid) -> None:
         """Tries to dispatch a Series Collector, i.e. to finish it's dataset collection and scheduling of further
         methods to extract the desired information.
         """
@@ -82,7 +94,23 @@ class SeriesDispatcher:
         # NOTE: This is the last given function, you should create more for extracting the information and
         # sending the data to the server
         maximum_wait_time = 1
-        pass
+
+        while self.series_collector[uid].last_update_time + maximum_wait_time > time.time():
+            await asyncio.sleep(0.2)
+        print("started dispatch")
+        self.series_collector[uid].dispatch_started = True
+        await self.dispatch_to_server(uid)
+        self.series_collector.pop(uid)
+
+    async def dispatch_to_server(self, uid) -> None:
+        series = models.Series(
+            SeriesInstanceUID = self.series_collector[uid].series_instance_uid,
+            PatientName = "TestName",
+            PatientID = 1,
+            StudyInstanceUID = "ABCSTUDYTESTUID",
+            InstancesInSeries = 42)
+        print("dispatched data", self.series_collector[uid].series_instance_uid)
+        requests.post("http://localhost:8000/series", json=series.model_dump())
 
 
 if __name__ == "__main__":

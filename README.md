@@ -13,3 +13,7 @@ If we update this document during the challenge, we will inform you about this s
 
 
 We wish you a lot of fun and success with the challenge 🚀
+
+# Time taken
+- 30 Minutes Research on DICOM and testing out PACS
+- 1 hour implementing functions

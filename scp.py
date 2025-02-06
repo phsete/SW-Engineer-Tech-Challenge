@@ -1,14 +1,17 @@
 from pydicom.dataset import FileMetaDataset
 from pynetdicom import AE, events, evt, debug_logger
 from pynetdicom.sop_class import MRImageStorage
+import asyncio
 
-debug_logger()
+# debug_logger()
 
 
 class ModalityStoreSCP():
-    def __init__(self) -> None:
+    def __init__(self, loop: asyncio.AbstractEventLoop, queue: asyncio.Queue) -> None:
         self.ae = AE(ae_title=b'STORESCP')
         self.scp = None
+        self.loop = loop
+        self.queue = queue
         self._configure_ae()
 
     def _configure_ae(self) -> None:
@@ -31,6 +34,12 @@ class ModalityStoreSCP():
         """
         dataset = event.dataset
         dataset.file_meta = FileMetaDataset(event.file_meta)
+
+        try:
+            
+            self.loop.call_soon_threadsafe(self.queue.put_nowait, dataset)
+        except asyncio.QueueFull:
+            print("Queue is full. Should not happen.")
 
         # TODO: Do something with the dataset. Think about how you can transfer the dataset from this place 
 
