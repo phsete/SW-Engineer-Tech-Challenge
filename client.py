@@ -115,7 +115,8 @@ class SeriesDispatcher:
     def dispatch_to_server(self, uid) -> None:
         series = self.extract_data(uid)
         print("dispatched data", series.SeriesInstanceUID)
-        requests.post("http://localhost:8000/series", json=series.model_dump())
+        response = requests.post("http://localhost:8000/series", json=series.model_dump())
+        print("API responded with code", response.status_code, "and body", response.text)
 
 
 if __name__ == "__main__":
