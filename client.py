@@ -78,12 +78,15 @@ class SeriesDispatcher:
         """
         # TODO: Get the data from the SCP and start dispatching
 
+        result = {}
         uid = dataset.SeriesInstanceUID
         if uid in self.series_collector:
             self.series_collector[uid].add_instance(dataset)
         else:
             self.series_collector[uid] = SeriesCollector(dataset)
-            self.loop.create_task(self.dispatch_series_collector(uid))
+            result = self.loop.create_task(self.dispatch_series_collector(uid))
+        
+        return result
 
     async def dispatch_series_collector(self, uid) -> None:
         """Tries to dispatch a Series Collector, i.e. to finish it's dataset collection and scheduling of further
@@ -99,8 +102,9 @@ class SeriesDispatcher:
             await asyncio.sleep(0.2)
         print("started dispatch")
         self.series_collector[uid].dispatch_started = True
-        self.dispatch_to_server(uid)
+        result = self.dispatch_to_server(uid)
         self.series_collector.pop(uid)
+        return result
 
     def extract_data(self, uid) -> models.Series:
         initial_dataset = self.series_collector[uid].series[0]
@@ -117,6 +121,7 @@ class SeriesDispatcher:
         print("dispatched data", series.SeriesInstanceUID)
         response = requests.post("http://localhost:8000/series", json=series.model_dump())
         print("API responded with code", response.status_code, "and body", response.text)
+        return response
 
 
 if __name__ == "__main__":

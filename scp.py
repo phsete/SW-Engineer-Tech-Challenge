@@ -3,7 +3,7 @@ from pynetdicom import AE, events, evt, debug_logger
 from pynetdicom.sop_class import MRImageStorage
 import asyncio
 
-# debug_logger()
+debug_logger()
 
 
 class ModalityStoreSCP():
