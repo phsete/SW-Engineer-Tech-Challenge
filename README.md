@@ -20,6 +20,12 @@ We wish you a lot of fun and success with the challenge 🚀
 - The data is automatically processed when sent by the PACS.
 - It is then stored in a file based sqlite database on server side (series_data.db) 
 
+### Running
+- install python dependencies `pip install -r requirements.txt`
+- start server with `uvicorn server:app`
+- start client with `python client.py`
+- start sending data over PACS
+
 ## Planning Documents
 General description from the processing pipeline of a set of datasets:
 
